@@ -1,5 +1,13 @@
 #include "Socket_client.h"
 
+void Socket_Cli::set_num(int _num){
+	num = _num;
+}
+
+int Socket_Cli::get_num(){
+	return num;
+}
+
 void Socket_Cli::set_sock(SOCKET _CS){
 	client_sock = _CS;
 }

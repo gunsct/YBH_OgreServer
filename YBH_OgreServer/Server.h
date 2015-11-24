@@ -2,13 +2,18 @@
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <vector>
+using namespace std;
 
 #include "Error.h"
 #include "Socket_client.h"
 
-
 #define SERVERPORT 9000
 #define BUFSIZE    512
+
+vector <Socket_Cli> cli_info;//클라 정보 저장용
+
 //클라이언트 리스트가 필요함 클라이언트 정보만있는 클래스랑
 class Server : public Error{
 private:
@@ -17,7 +22,7 @@ private:
 	SOCKET server_sock;
 	SOCKADDR_IN serveraddr;
 
-	Socket_Cli SC;
+	int cli_num;
 
 	/*SOCKET client_sock;
 	SOCKADDR_IN clientaddr;
