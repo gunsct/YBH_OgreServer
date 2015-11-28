@@ -38,4 +38,7 @@ public:
 	void bind_set();
 	void listen_set();
 	void accept_set();
+	//서버도 그냥 파싱이랑 패킷셋팅 여기에 넣는게 좋을거같은데 아닌가? 전역 함수때문에 새로 만들어야하는건..가?
+	void set_packet();
+	void parsing_msg(char packet);//패킷 분할해서 따로 배열 담고 자료형변환해서 원래 값들로 줄꺼다
 };
