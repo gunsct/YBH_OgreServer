@@ -1,3 +1,4 @@
+#pragma once
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 
@@ -9,6 +10,9 @@ private:
 	SOCKADDR_IN clientaddr;
 
 public:
+	Socket_Cli(){}
+	~Socket_Cli(){}
+
 	int addrlen;
 
 	void set_num(int _num);

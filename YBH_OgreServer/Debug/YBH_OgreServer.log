@@ -1,0 +1,12 @@
+﻿빌드 시작: 2015-11-30 오전 12:57:49
+     1>2 노드의 "C:\Users\gunsct\Desktop\project\graphics\YBH_OgreServer\YBH_OgreServer\YBH_OgreServer.vcxproj" 프로젝트(Build 대상)입니다.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Server.cpp
+         Server.cpp
+     1>c:\users\gunsct\desktop\project\graphics\ybh_ogreserver\ybh_ogreserver\server.cpp(50): error C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1868) : 'inet_ntoa' 선언을 참조하십시오.
+     1>"C:\Users\gunsct\Desktop\project\graphics\YBH_OgreServer\YBH_OgreServer\YBH_OgreServer.vcxproj" 프로젝트를 빌드했습니다(Build 대상). - 실패
+
+빌드하지 못했습니다.
+
+경과 시간: 00:00:00.75

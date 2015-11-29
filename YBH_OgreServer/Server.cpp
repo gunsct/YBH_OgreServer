@@ -5,20 +5,20 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 {
 	Error ER;
 
-	//여기부분을 이제.. 전역 리스트로 가져다가 해야겠지?
-	SOCKET client_sock = (SOCKET)arg;
+	Socket_Cli SC;//여기부분을 이제.. 전역 리스트로 가져다가 해야겠지?
+	Parser Ps;
+
+	SC.set_sock((SOCKET)arg);
 	int retval;
-	SOCKADDR_IN clientaddr;
-	int addrlen;
 	char buf[BUFSIZE + 1];
 
 	// 클라이언트 정보 얻기
-	addrlen = sizeof(clientaddr);
-	getpeername(client_sock, (SOCKADDR *)&clientaddr, &addrlen);
+	SC.addrlen = sizeof(SC.get_sockaddr());
+	getpeername(SC.get_sock(), (SOCKADDR *)&SC.get_sockaddr(), &SC.addrlen);
 
 	while (1){
 		// 데이터 받기
-		retval = recv(client_sock, buf, BUFSIZE, 0);
+		retval = recv(SC.get_sock(), buf, BUFSIZE, 0);
 		if (retval == SOCKET_ERROR){
 			ER.err_display("recv()");
 			break;
@@ -26,29 +26,46 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		else if (retval == 0)
 			break;
 
+		//accept하고 넣으려했더니 패킷을 받아서 해석한다음에 해야하는거라 여기서 함
+		//파서에서 최초생성 조건 맞을때만 카운터 증가해서 넘버로 준다 그리고 벡터에 등록하는것도 마찬가지다.
+		//if(파서 조건 맞으면) 
+		if (Ps.parsing_msg(buf) == 0){
+			SC.set_num(cli_num);
+			cli_info.push_back(SC);
+			cli_num++;
+		}
+		
+
 		// 받은 데이터 출력
 		buf[retval] = '\0';
-		printf("[TCP/%s:%d] %s\n", inet_ntoa(clientaddr.sin_addr),
-			ntohs(clientaddr.sin_port), buf);
+		/*printf("[TCP/%s:%d] %s\n", inet_ntoa(SC.get_sockaddr().sin_addr),
+			ntohs(SC.get_sockaddr().sin_port), buf);*/
 
 		//받은 데이터에서 클라 넘버부분만 보내올때는 0일테니 벡터에서 검색해서 같은 아이피인거 찾아서 그 넘버로 대체해서 전체에 전송한다
 		//buf[0~1]넘버가 00~99 이런식으로 지정될거란말이지 그럼 클라 넘버를 저기에 넣어서 값을 바꿔버리는거지뭐 클라 번호는 itoa로 이미 문자열로
 		//바꿔진 상태일태고 그거 인덱스단위로 전해줘야할거같다
-
-
+		int max = cli_info.size();
+		for (int i = 0; i < max; i++){
+			//getpeername(cli_info[i].get_sock(), (SOCKADDR *)&cli_info[i].get_sockaddr(), &cli_info[i].addrlen);
+			if (inet_ntoa(cli_info[i].get_sockaddr().sin_addr) == inet_ntoa(SC.get_sockaddr().sin_addr)){//벡터에 있는 클라중 접속한 클라랑 아이피 동일한거면 넘버 리패킷해줌 
+				strcpy(buf, Ps.re_packet_msg(buf, cli_info[i].get_num()));
+			}
+		}
 		// 데이터 보내기
 		//받은걸 보낸 클라 빼고 전체에게 다시 전송한다, 보낸 클라 포함해도 상관없을듯
-		retval = send(client_sock, buf, retval, 0);
-		if (retval == SOCKET_ERROR){
-			ER.err_display("send()");
-			break;
+		for (int i = 0; i < max; i++){
+			retval = send(cli_info[i].get_sock(), buf, retval, 0);
+			if (retval == SOCKET_ERROR){
+				ER.err_display("send()");
+				break;
+			}
 		}
 	}
 
 	// closesocket()
-	closesocket(client_sock);
+	closesocket(SC.get_sock());
 	printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
-		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+		inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));
 
 	return 0;
 }
@@ -94,19 +111,13 @@ void Server::accept_set(){//accept에서 클라이언트 최초 정보 받는거 전부 벡터엔 �
 			err_display("accept()");
 			break;
 		}
-		//accept 끝나고 이제 리스트에다 소캣 클래스를 넣어야함
-		//파서에서 최초생성 조건 맞을때만 카운터 증가해서 넘버로 준다 그리고 벡터에 등록하는것도 마찬가지다.
-		//if(파서 조건 맞으면) cli_num++
-		//SC.set_num(cli_num);
-		cli_info.push_back(SC);
 
 		// 접속한 클라이언트 정보 출력
 		printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
 			inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));
 
 		// 스레드 생성, 어짜피 모든 클라 정보다 써야하니 특정 소캣을 인자로 보낼 필요가없을거같다는 내판단은 잘못됬다.. 데이터는 받아야지
-		hThread = CreateThread(NULL, 0, ProcessClient,
-			(LPVOID)SC.get_sock(), 0, NULL);
+		hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)SC.get_sock(), 0, NULL);
 		if (hThread == NULL) { closesocket(server_sock); }
 		else { CloseHandle(hThread); }
 	}
