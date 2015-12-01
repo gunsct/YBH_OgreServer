@@ -47,8 +47,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		int max = cli_info.size();
 		for (int i = 0; i < max; i++){
 			//getpeername(cli_info[i].get_sock(), (SOCKADDR *)&cli_info[i].get_sockaddr(), &cli_info[i].addrlen);
-			if (inet_ntoa(cli_info[i].get_sockaddr().sin_addr) == inet_ntoa(SC.get_sockaddr().sin_addr)){//벡터에 있는 클라중 접속한 클라랑 아이피 동일한거면 넘버 리패킷해줌 
-				strcpy(buf, Ps.re_packet_msg(buf, cli_info[i].get_num()));
+			if (cli_info[i].get_sockaddr().sin_port == SC.get_sockaddr().sin_port){//벡터에 있는 클라중 접속한 클라랑 아이피 동일한거면 넘버 리패킷해줌 
+				strcpy_s(buf, Ps.re_packet_msg(buf, cli_info[i].get_num()));
 			}
 		}
 		// 데이터 보내기
@@ -64,8 +64,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 	// closesocket()
 	closesocket(SC.get_sock());
-	printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
-		inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));
+	/*printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
+		inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));*/
 
 	return 0;
 }
@@ -113,8 +113,8 @@ void Server::accept_set(){//accept에서 클라이언트 최초 정보 받는거 전부 벡터엔 �
 		}
 
 		// 접속한 클라이언트 정보 출력
-		printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
-			inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));
+	/*	printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
+			inet_ntoa(SC.get_sockaddr().sin_addr), ntohs(SC.get_sockaddr().sin_port));*/
 
 		// 스레드 생성, 어짜피 모든 클라 정보다 써야하니 특정 소캣을 인자로 보낼 필요가없을거같다는 내판단은 잘못됬다.. 데이터는 받아야지
 		hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)SC.get_sock(), 0, NULL);
