@@ -41,14 +41,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	int addrlen;
 	char buf[BUFSIZE+1];
 
-	Cr.Enter();
+	
 
 	// 클라이언트 정보 얻기
 	addrlen = sizeof(clientaddr);
 	getpeername(client_sock, (SOCKADDR *)&clientaddr, &addrlen);
 
 	while(1){
-		Cr.Enter();
+		
 		// 데이터 받기
 		buf[0] = '\0';
 		retval = recv(client_sock, buf, BUFSIZE, 0);
@@ -77,7 +77,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				strcpy_s(buf, Ps.re_packet_msg(buf, SC.get_num(), cli_info[i].get_num()));//패킷을 보낸 클라이언트의 넘버를 리패킷
 			}
 		}
-		
+
+		Cr.Enter();
 		// 데이터 보내기
 		//받은걸 보낸 클라 빼고 전체에게 다시 전송한다, 보낸 클라 포함해도 상관없을듯
 		retval = strlen(buf);
@@ -93,14 +94,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				break;
 			}
 		}
+		Cr.Leave();
 	}
-
+	
 	// closesocket()
 	closesocket(client_sock);
 	printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
-	Cr.Leave();
+	
 	return 0;
 }
 

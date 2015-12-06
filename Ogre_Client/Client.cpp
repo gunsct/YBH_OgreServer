@@ -89,11 +89,11 @@ void Client::transfer(){
 		z += (float)(rand() % 10 - 5);
 
 		// 데이터 입력
-		printf("\n[보낼 데이터] ");
-
+		//printf("\n[보낼 데이터] ");
+		Cr.Enter();
 		//패킷 제작
 		strcpy(buf, Ps.packeting(player_num, other_num, regi, x, y, z));
-
+		
 		// 데이터 보내기
 		retval = send(sock, buf, strlen(buf), 0);
 		if (retval == SOCKET_ERROR){
@@ -101,7 +101,10 @@ void Client::transfer(){
 			break;
 		}
 		printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+		printf("[보낸 데이터] %s\n", buf);
+		Cr.Leave();
 
+		
 		// 데이터 받기
 		retval = recvn(sock, buf, retval, 0);
 		if (retval == SOCKET_ERROR){
@@ -115,6 +118,7 @@ void Client::transfer(){
 		buf[retval] = '\0';
 		printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
 		printf("[받은 데이터] %s\n", buf);
+		
 
 		//파싱 구현
 		Ps.parsing_msg(buf);
@@ -124,10 +128,10 @@ void Client::transfer(){
 		x = Ps.get_xp();
 		y = Ps.get_yp();
 		z = Ps.get_zp();
-		printf("%d %d %d %f %f %f", player_num, other_num, regi, x, y, z);
+		//printf("%d %d %d %f %f %f\n", player_num, other_num, regi, x, y, z);
 
 		regi = 1;
-		Sleep(200);
+		//Sleep(2000);
 	}
 }
 

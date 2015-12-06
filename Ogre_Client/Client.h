@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "Parser.h"
+#include "Synchronization.h"
 
 #define SERVERIP   "127.0.0.1"
 #define SERVERPORT 9000
@@ -17,7 +18,7 @@ private:
 	WSADATA wsa;
 	SOCKET sock;
 	SOCKADDR_IN serveraddr;
-
+	Critical Cr;
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len;
@@ -31,6 +32,7 @@ private:
 
 	Parser Ps;
 
+	clock_t start, finish;
 public:
 	Client();
 	~Client();
